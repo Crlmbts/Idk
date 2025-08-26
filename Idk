@@ -1,0 +1,78 @@
+-- StarterPlayerScripts LocalScript --
+
+--// Function to call
+local function rollEgg()
+    game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Eggs_Roll"):InvokeServer()
+end
+
+--// Player & GUI
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "RainbowEggUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+--// Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 150)
+frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true -- draggable
+frame.Parent = gui
+
+-- Rainbow Background effect
+task.spawn(function()
+	while true do
+		for i = 0, 255, 5 do
+			frame.BackgroundColor3 = Color3.fromHSV(i/255, 1, 1)
+			task.wait(0.05)
+		end
+	end
+end)
+
+--// Title Text
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Rainbow Egg Roller"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = frame
+
+--// Toggle Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.6, 0, 0.3, 0)
+button.Position = UDim2.new(0.2, 0, 0.5, 0)
+button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+button.Text = "OFF"
+button.TextColor3 = Color3.fromRGB(255, 0, 0)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 18
+button.Parent = frame
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = button
+
+--// Toggle State
+local toggled = false
+button.MouseButton1Click:Connect(function()
+	toggled = not toggled
+	if toggled then
+		button.Text = "ON"
+		button.TextColor3 = Color3.fromRGB(0, 255, 0)
+		-- Run the function repeatedly while ON
+		task.spawn(function()
+			while toggled do
+				rollEgg()
+				task.wait(1) -- adjust repeat delay
+			end
+		end)
+	else
+		button.Text = "OFF"
+		button.TextColor3 = Color3.fromRGB(255, 0, 0)
+	end
+end)
